@@ -32,7 +32,7 @@ const seedData = (req, res) => {
  * @param {Object} req 
  * @param {Object} res 
  */
-const insertStudents = (req, res) => {
+const insertStudents = async (req, res) => {
     const insertQuery = 'INSERT INTO students (name, age, mark1, mark2, mark3) VALUES ($1, $2, $3, $4, $5)';
     const parseCsv = () => {
         return new Promise ((resolve, reject) => {
@@ -44,23 +44,18 @@ const insertStudents = (req, res) => {
             .on('end', (rowCount) => resolve(students));
         });
     }
-    parseCsv().then(students => {
-       students.forEach(student => {
-           pool.query(insertQuery, [student.name, student.age, student.mark1, student.mark2, student.mark3], (error, results) => {
-               if (error) {
-                   res.status(500).json({
-                       message: 'Internal Server Error'
-                   });
-                   return;
-               }
-           });
-       });
-    }).catch(err => {
-        res.status(500).json({
-            message: 'Internal Server Error'
+
+    const students = await parseCsv();
+    students.forEach(student => {
+        pool.query(insertQuery, [student.name, student.age, student.mark1, student.mark2, student.mark3], (error, results) => {
+            if (error) {
+                res.status(500).json({
+                    message: 'Internal Server Error'
+                });
+                return;
+            }
         });
-        return;
-    })
+    });
     res.status(200).json({
         message: 'Students Inserted'
     });

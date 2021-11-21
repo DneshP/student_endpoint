@@ -15,8 +15,8 @@ const routes = (app) => {
             next();
         }, getStudenReportWithId)
     app.route('/portal')
-        .get((request, response) =>
-            response.render('index', { title: 'Welcome, lets get that csv.'})
+        .get(async (request, response) =>
+            await response.render('index', { title: 'Welcome, lets get that csv.'})
         )
     app.route('/upload')
         .post((request, response, next) =>{
